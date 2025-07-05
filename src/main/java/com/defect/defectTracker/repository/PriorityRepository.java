@@ -11,4 +11,6 @@ public interface PriorityRepository extends JpaRepository<Priority, Long> {
     boolean existsByColor(String color);
     Optional<Priority> findByPriorityIgnoreCase(String priority);
     Optional<Priority> findByColorIgnoreCase(String color);
+    Optional<Priority> findByPriority(String priority);
+
 }

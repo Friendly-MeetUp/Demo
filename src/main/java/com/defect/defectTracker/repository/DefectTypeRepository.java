@@ -7,9 +7,13 @@ import com.defect.defectTracker.entity.DefectType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 
 @Transactional
 @Repository
 public interface DefectTypeRepository extends JpaRepository<DefectType, Long> {
     boolean existsByDefectTypeNameIgnoreCase(String defectTypeName);
+    Optional<DefectType> findByDefectTypeName(String defectTypeName);
+
 }

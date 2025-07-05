@@ -214,6 +214,7 @@ public class ProjectAllocationServiceImpl implements ProjectAllocationService {
             if (bench == null) {
                 bench = new Bench();
                 bench.setUser(user);
+                bench.setBenchId(java.util.UUID.randomUUID().toString());
                 bench.setBenchId(generateNextBenchId());
             }
             bench.setAllocated(totalAllocated);

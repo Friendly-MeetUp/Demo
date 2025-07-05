@@ -19,7 +19,10 @@ import java.io.IOException;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @CrossOrigin("*")
@@ -33,147 +36,161 @@ public class DefectController {
 
     @Autowired
     private DefectService defectService;
-
+//Post Controller
     @PostMapping
     public ResponseEntity<StandardResponse> createDefect(@RequestBody DefectDto defectDto) {
         try {
             StandardResponse response = defectService.createDefect(defectDto);
-            return ResponseEntity
-                    .status(response.getStatusCode() == 2000 ? 201 : 400)
-                    .body(response);
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
-            // Optionally log the error here
             e.printStackTrace(); // or use a logger
             StandardResponse errorResponse = new StandardResponse(
-                    "Error",
+                    "Failure",
                     "Failed to create defect: " + e.getMessage(),
                     null,
-                    500
+                    4000
             );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+            return ResponseEntity.ok(errorResponse);        }
     }
-
-
-    @GetMapping("/{id}")
-    public ResponseEntity<StandardResponse> getDefectById(@PathVariable Long id) {
-        try {
-            DefectDto defectDto = defectService.getDefectById(id);
-            return ResponseEntity.ok(
-                    new StandardResponse("success", "defect found for this id", defectDto, 2000)
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(
-                    new StandardResponse("failure", "No defect found for this id", null, 4000)
-            );
-        }
-    }
-    //i am writing this code to get the defect by id
-    //No get output is coming from the service layer
-//    @GetMapping("/{id}")
-//    public ResponseEntity<StandardResponse> getDefectById(@PathVariable Long id) {
-//        try {
-//            DefectDto defectDto = defectService.getById(id);
-//            return ResponseEntity.ok(
-//                    new StandardResponse("success", "defect found for this id", defectDto, 2000)
-//            );
-//        } catch (Exception e) {
-//            return ResponseEntity.status(404).body(
-//                    new StandardResponse("failure", "No defect found for this id", null, 4000)
-//            );
-//        }
-//    }
-    //03----------------------------------------------------------------------------------------------------------------
-
-    @PutMapping("{id}")
-    public ResponseEntity<StandardResponse> updateDefect(@PathVariable Long id, @RequestBody DefectDto dto) {
+//Update Controller
+@PutMapping("/{id}")
+public ResponseEntity<StandardResponse> updateDefect(@PathVariable Long id, @RequestBody DefectDto dto) {
+    try {
         StandardResponse response = defectService.updateDefect(id, dto);
-        int statusCode = response.getStatusCode() == 2000 ? 200 : 400;
-        return ResponseEntity.status(statusCode).body(response);}
-    //04----------------------------------------------------------------------------------------------------------------
-    @DeleteMapping("/{id}")
-    public ResponseEntity<StandardResponse> deleteDefect(@PathVariable Long id) {
-        StandardResponse response = defectService.deleteDefectById(id);
         return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        e.printStackTrace(); // Or use a proper logger
+        StandardResponse errorResponse = new StandardResponse(
+                "Failure",
+                "Failed to update defect: " + e.getMessage(),
+                null,
+                4001
+        );
+        return ResponseEntity.ok().body(errorResponse);
     }
+}
+
+
+//Update Controller
+@GetMapping("/{id}")
+public ResponseEntity<StandardResponse> getDefectById(@PathVariable Long id) {
+    try {
+        Map<String, Object> defectMap = defectService.getDefectCustomResponseById(id);
+        return ResponseEntity.ok(
+                new StandardResponse("success", "defect found for this id", defectMap, 2000)
+        );
+    } catch (NoSuchElementException e) {
+        return ResponseEntity.ok().body(
+                new StandardResponse("failure", e.getMessage(), null, 4000)
+        );
+    } catch (Exception e) {
+        return ResponseEntity.ok().body(
+                new StandardResponse("error", "Internal server error", null, 4000)
+        );
+    }
+}
+
     //05----------------------------------------------------------------------------------------------------------------
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<StandardResponse> getDefectsByProjectId (@PathVariable Long projectId){
+    public ResponseEntity<StandardResponse> getDefectsByProjectId(@PathVariable Long projectId) {
         try {
-            List<DefectDto> defectList = defectService.getDefectsByProjectId(projectId);
+            List<Map<String, Object>> defectList = defectService.getDefectsCustomResponseByProjectId(projectId);
+            if (defectList.isEmpty()) {
+                return ResponseEntity.ok().body(
+                        new StandardResponse("failure", "No defects found for this projectId", null, 4000)
+                );
+            }
             return ResponseEntity.ok(
-                    new StandardResponse("success", "defect found for this id", defectList, 2000)
+                    new StandardResponse("success", "defects found for this projectId", defectList, 2000)
             );
         } catch (Exception e) {
-            return ResponseEntity.status(404).body(
-                    new StandardResponse("failure", "No defect found for this projectId", null, 4000)
+            return ResponseEntity.ok().body(
+                    new StandardResponse("error", "Internal server error", null, 4000)
             );
         }
     }
+
     //06----------------------------------------------------------------------------------------------------------------
     @GetMapping("/byReleaseTestcase/{releaseTestcaseId}")
-    public ResponseEntity<StandardResponse> getDefectsByReleaseTestCaseId (@PathVariable Long releaseTestcaseId)
-    {
+    public ResponseEntity<StandardResponse> getDefectsByReleaseTestCaseId(@PathVariable Long releaseTestcaseId) {
         try {
-            DefectDto defects = defectService.getDefectsByReleaseTestCaseId(releaseTestcaseId);
+            Map<String, Object> defectMap = defectService.getDefectCustomResponseByReleaseTestCaseId(releaseTestcaseId);
             return ResponseEntity.ok(new StandardResponse(
-                    "Success", "Defects fetched successfully", defects, 2001
+                    "Success", "Defect fetched successfully", defectMap, 2000
             ));
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(404).body(new StandardResponse(
-                    "Failure", e.getMessage(), null, 4004
+            return ResponseEntity.ok().body(new StandardResponse(
+                    "Failure", e.getMessage(), null, 4000
             ));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new StandardResponse(
-                    "Failure", "Internal Server Error", null, 5000
+            return ResponseEntity.ok().body(new StandardResponse(
+                    "Failure", "Internal Server Error", null, 4000
             ));
         }
     }
-    //i am writing this code to get the defect by id
-    //No get output is coming from the service layer
-//    @GetMapping("/byReleaseTestcase/{releaseTestcaseId}")
-//    public ResponseEntity<StandardResponse> getDefectsByReleaseTestCaseId (@PathVariable Long releaseTestcaseId)
-//    {
-//        try {
-//            DefectDto defects = defectService.getByReleaseTestCaseId(releaseTestcaseId);
-//            return ResponseEntity.ok(new StandardResponse(
-//                    "Success", "Defects fetched successfully", defects, 2001
-//            ));
-//        } catch (NoSuchElementException e) {
-//            return ResponseEntity.status(404).body(new StandardResponse(
-//                    "Failure", e.getMessage(), null, 4004
-//            ));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body(new StandardResponse(
-//                    "Failure", "Internal Server Error", null, 5000
-//            ));
-//        }
-//    }
 
     //07----------------------------------------------------------------------------------------------------------------
-    @GetMapping("/filter")
-    public ResponseEntity<StandardResponse> filterDefects (
-            @RequestParam Long projectId,
-            @RequestParam(required = false) Long defectStatusId,
-            @RequestParam(required = false) Long severityId,
-            @RequestParam(required = false) Long priorityId,
-            @RequestParam(required = false) Long typeId,
-            @RequestParam(required = false) Long ReleaseTestCaseId,
-            @RequestParam(required = false) Long AssignbyId,
-            @RequestParam(required = false) Long AssigntoId
+    @GetMapping("/byReleaseTestcase/testcase/{testCaseId}")
+    public ResponseEntity<StandardResponse> fetchDefectsByTestCaseIdWithDetails(@PathVariable Long testCaseId) {
+        try {
+            List<Map<String, Object>> defectList = defectService.fetchDefectsByTestCaseIdWithDetails(testCaseId);
+            return ResponseEntity.ok(new StandardResponse(
+                    "Success", "Defects fetched successfully", defectList, 2000
+            ));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.ok(new StandardResponse(
+                    "Failure", e.getMessage(), null, 4000
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new StandardResponse(
+                    "Failure", "Internal Server Error", null, 4000
+            ));
+        }
+    }
+//    ----------------------------------------------------------------------------
+@GetMapping("/filter")
+public ResponseEntity<StandardResponse> filterDefects(
+        @RequestParam(required = false) Long projectId,
+        @RequestParam(required = false) Long defectStatusId,
+        @RequestParam(required = false) Long severityId,
+        @RequestParam(required = false) Long priorityId,
+        @RequestParam(required = false) Long typeId,
+        @RequestParam(name = "releaseTestCaseId", required = false) Long releaseTestCaseId,
+        @RequestParam(name = "assignById", required = false) Long assignById,
+        @RequestParam(name = "assignToId", required = false) Long assignToId,
+        @RequestParam(required = false) Long moduleId,
+        @RequestParam(required = false) Long subModuleId
+) {
+    try {
+        // Check required param
+        if (projectId == null) {
+            return ResponseEntity.ok(new StandardResponse(
+                    "Failure", "Project ID is mandatory", null, 4000
+            ));
+        }
 
-    ){
         DefectDto dto = new DefectDto();
         dto.setProjectId(projectId);
         dto.setDefectStatusId(defectStatusId);
         dto.setSeverityId(severityId);
         dto.setPriorityId(priorityId);
         dto.setTypeId(typeId);
-        dto.setReleaseTestCaseId(ReleaseTestCaseId);
-        dto.setAssignbyId(AssignbyId);
-        dto.setAssigntoId(AssigntoId);
+        dto.setReleaseTestCaseId(releaseTestCaseId);
+        dto.setAssignbyId(assignById);
+        dto.setAssigntoId(assignToId);
+        dto.setModuleId(moduleId);
+        dto.setSubModuleId(subModuleId);
+
+        // Delegate to service
         return defectService.filterDefects(dto);
+
+    } catch (Exception e) {
+        return ResponseEntity.ok(new StandardResponse(
+                "Failure", "Internal Server Error", null, 4000
+        ));
     }
+}
     //08----------------------------------------------------------------------------------------------------------------
 
     @GetMapping("/export")
@@ -183,27 +200,55 @@ public class DefectController {
         defectService.exportDefects(response);
     }
 
-
-    //------------------------------------------------------------------------------------------------------------------
-    @GetMapping("/exportAsId")
-    public void exportdefIds(HttpServletResponse response) throws IOException {
-        response.setContentType("text/csv");
-        response.setHeader("Content-Disposition", "attachment; filename=defects.csv");
-        defectService.exportdefectIds(response);
-    }
     //----------------------------------------------------------------------------------------------------------------------
-    @PostMapping(value = "/import", consumes = {"multipart/form-data"})
-    public ResponseEntity<StandardResponse> uploadDefects(@RequestParam("file") MultipartFile file) {
+    @PostMapping("/import")
+    public ResponseEntity<StandardResponse> importDefects(@RequestParam("file") MultipartFile file) {
         try {
-            int importedCount = defectService.uploadDefects(file);
-            String msg = "Imported Successfully: " + importedCount + " records";
-            StandardResponse response = new StandardResponse("success", "Imported Successfully", null, 2000);
-            return ResponseEntity.ok(response);
+            int count = defectService.importDefectsFromCsv(file);
+
+            if (count == 0) {
+                return ResponseEntity.ok(new StandardResponse(
+                        "failure",
+                        "Imported 0 defects",
+                        null,
+                        4000
+                ));
+            } else {
+                return ResponseEntity.ok(new StandardResponse(
+                        "success",
+                        "Imported " + count + " defects",
+                        null,
+                        2000
+                ));
+            }
         } catch (Exception e) {
-            logger.error("Import failed", e);
-            StandardResponse errorResponse = new StandardResponse("failure",  "Import failed: " + e.getMessage(),null, 4000);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ResponseEntity.ok().body(
+                    new StandardResponse(
+                            "error",
+                            "Import failed: " + e.getMessage(),
+                            null,
+                            4000
+                    )
+            );
         }
     }
+
+
+    //Delete Controller
+@DeleteMapping("/{id}")
+public ResponseEntity<StandardResponse> deleteDefect(@PathVariable Long id) {
+    try {
+        StandardResponse response = defectService.deleteDefectById(id);
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        e.printStackTrace(); // You can replace this with proper logging
+        StandardResponse errorResponse = new StandardResponse(
+                "Failure",
+                "Failed to delete defect: " + e.getMessage(),
+                null,
+                4000
+        );
+        return ResponseEntity.ok(errorResponse);
+    }
 }
-//---
+}

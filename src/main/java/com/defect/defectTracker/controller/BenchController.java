@@ -34,10 +34,12 @@ public class BenchController {
 
         if (results == null || results.isEmpty()) {
             return ResponseEntity.status(400).body("No matching bench users found for the given criteria.");
+//            return ResponseEntity.status(404).body("No matching bench users found for the given criteria.");
         }
         java.util.Map<String, Object> response = ((com.defect.defectTracker.service.BenchServiceImpl) benchService)
                 .searchBenchesWithStatus(benchId, availability, allocated, firstName, lastName, designation, startDate, endDate, availabilityGreaterThanOrEqual);
         return ResponseEntity.ok(response);
+//        return ResponseEntity.ok(results);
     }
 
 }

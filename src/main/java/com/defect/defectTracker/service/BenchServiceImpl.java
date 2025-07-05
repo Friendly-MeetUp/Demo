@@ -26,8 +26,20 @@ public class BenchServiceImpl implements BenchService {
     private ProjectAllocationRepository projectAllocationRepository;
 
 
+    @Override
+    public BenchDto getBenchByUserFullName(String firstName, String lastName) {
+        return null;
+    }
 
+    @Override
+    public List<BenchDto> getBenchesByAvailabilityGreaterThan(int availability) {
+        return List.of();
+    }
 
+    @Override
+    public List<BenchDto> getBenchDetails() {
+        return List.of();
+    }
 
     public List<BenchDto> searchBenches(String benchId, Integer availability, Integer allocated, String firstName, String lastName, String designation, String startDate, String endDate, boolean availabilityGreaterThan) {
         Specification<Bench> spec = (root, query, cb) -> {

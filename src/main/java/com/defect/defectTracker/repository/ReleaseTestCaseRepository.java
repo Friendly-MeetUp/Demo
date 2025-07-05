@@ -1,7 +1,6 @@
 package com.defect.defectTracker.repository;
 
 import com.defect.defectTracker.entity.ReleaseTestCase;
-import com.defect.defectTracker.entity.TestCase;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +13,6 @@ public interface ReleaseTestCaseRepository extends JpaRepository<ReleaseTestCase
     boolean existsByReleasesIdAndTestCaseId(Long id, Long id1);
 
     ReleaseTestCase findByReleasesIdAndTestCaseId(Long id, Long id1);
+    List<ReleaseTestCase> findByTestCase_Description(String description);
+
 }

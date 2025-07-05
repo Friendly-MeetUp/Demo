@@ -14,4 +14,5 @@ public interface DefectStatusRepository extends JpaRepository<DefectStatus, Long
     Optional<DefectStatus> findByColorCode(String colorCode);
 //    Optional<DefectStatus> findByName(String name);
 
+
 }
