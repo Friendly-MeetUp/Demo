@@ -1,6 +1,7 @@
 package com.defect.defectTracker.repository;
 
 import com.defect.defectTracker.entity.*;
+import com.defect.defectTracker.entity.Defect;
 import jakarta.transaction.Transactional;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import java.util.Optional;
+
 @Transactional
 @Repository
 
@@ -21,6 +24,7 @@ public interface DefectRepository extends JpaRepository<Defect, Long> {
     String findTopByOrderByIdDesc();
 //----
     Optional<Defect> findById(Long id);
+
     List<Defect> findByProjectId(Long projectId);
 
     Defect findByReleaseTestCaseId(Long releaseTestCaseId);

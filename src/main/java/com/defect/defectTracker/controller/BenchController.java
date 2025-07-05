@@ -31,10 +31,15 @@ public class BenchController {
     ) {
         boolean availabilityGreaterThanOrEqual = "gt".equalsIgnoreCase(availabilityType) || "gte".equalsIgnoreCase(availabilityType);
         List<BenchDto> results = benchService.searchBenches(benchId, availability, allocated, firstName, lastName, designation, startDate, endDate, availabilityGreaterThanOrEqual);
+
         if (results == null || results.isEmpty()) {
-            return ResponseEntity.status(404).body("No matching bench users found for the given criteria.");
+            return ResponseEntity.status(400).body("No matching bench users found for the given criteria.");
+//            return ResponseEntity.status(404).body("No matching bench users found for the given criteria.");
         }
-        return ResponseEntity.ok(results);
+        java.util.Map<String, Object> response = ((com.defect.defectTracker.service.BenchServiceImpl) benchService)
+                .searchBenchesWithStatus(benchId, availability, allocated, firstName, lastName, designation, startDate, endDate, availabilityGreaterThanOrEqual);
+        return ResponseEntity.ok(response);
+//        return ResponseEntity.ok(results);
     }
 
 }

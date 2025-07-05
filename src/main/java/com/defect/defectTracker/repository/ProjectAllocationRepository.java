@@ -40,6 +40,8 @@ public interface ProjectAllocationRepository extends JpaRepository<ProjectAlloca
 
     @Query("SELECT COALESCE(SUM(pa.allocationPercentage), 0) FROM ProjectAllocation pa WHERE pa.user.id = :userId")
     int sumAllocationPercentageByUserId(@Param("userId") Long userId);
+    @Query(value = "SELECT MAX(id) FROM project_allocation", nativeQuery = true)
+    Long findMaxId();
 
     boolean existsByUserAndProject(User user, Project project);
 }

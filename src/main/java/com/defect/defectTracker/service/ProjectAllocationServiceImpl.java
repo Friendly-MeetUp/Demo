@@ -38,6 +38,12 @@ public class ProjectAllocationServiceImpl implements ProjectAllocationService {
     @Autowired
     private BenchRepository benchRepository;
 
+    private String generateNextBenchId() {
+        Long maxId = projectAllocationRepository.findMaxId();
+        long nextNumericId = (maxId == null) ? 1 : maxId + 1;
+        return String.format("BE%04d", nextNumericId);
+    }
+
     @Override
     public ProjectAllocationDto createProjectAllocation(ProjectAllocationDto requestDto) {
         validateRequestDto(requestDto);
@@ -209,6 +215,7 @@ public class ProjectAllocationServiceImpl implements ProjectAllocationService {
                 bench = new Bench();
                 bench.setUser(user);
                 bench.setBenchId(java.util.UUID.randomUUID().toString());
+                bench.setBenchId(generateNextBenchId());
             }
             bench.setAllocated(totalAllocated);
             bench.setAvailability(100 - totalAllocated);

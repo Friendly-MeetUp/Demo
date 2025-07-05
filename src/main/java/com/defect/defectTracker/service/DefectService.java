@@ -34,7 +34,6 @@ int importDefectsFromCsv(MultipartFile file) throws IOException;
     StandardResponse createDefect(DefectDto defectDto);
     StandardResponse updateDefect(Long id, DefectDto defectDto);
     StandardResponse deleteDefectById(Long id);
-//   DefectDto getDefectById(Long id);
     List<DefectDto> getDefectsByProjectId(Long projectId);
     DefectDto getDefectsByReleaseTestCaseId(Long releaseTestCaseId);
     ResponseEntity<StandardResponse> filterDefects(DefectDto defectDto);
